@@ -39,5 +39,9 @@ int main() {
     double* answer = M.calculate();
     for (int i = 0; i < n; i++)
         cout << answer[i] << "\t";
-    return 0;
+    cout << endl;
+    double* x_next = M.iter();
+    for (int i = 0; i < n; i++) {
+        cout << "x" << i << " = " << x_next[i] << std::endl;
+    }
 }

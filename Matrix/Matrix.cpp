@@ -105,4 +105,86 @@ public:
 		}
 		return ans;
 	}
+
+	double* iter() {
+		double** E;
+		E = new double* [size];
+		for (int i = 0; i < size; i++) {
+			E[i] = new double[size + 1];
+		}
+		double** A;
+		A = new double* [size];
+		for (int i = 0; i < size; i++) {
+			A[i] = new double[size];
+		}
+		Matrix mat(size);
+		double* main_koef;
+		main_koef = new double[size];
+		double* B;
+		B = new double[size];
+
+		//Заполнение единичной матрицы
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size + 1; j++) {
+				if (i == j)
+					E[i][j] = 1;
+				else
+					E[i][j] = 0;
+			}
+		}
+
+		for (int i = 0; i < size; i++) {
+			main_koef[i] = matrix[i][i];
+		}
+
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size + 1; j++) {
+				A[i][j] = matrix[i][j] / main_koef[i];
+			}
+		}
+
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size + 1; j++) {
+				A[i][j] = E[i][j] - A[i][j];
+			}
+		}
+
+		for (int i = 0; i < size; i++) {
+			B[i] = matrix[i][size] / main_koef[i];
+		}
+
+		double* x_prev = new double[size];
+		double* x_next = new double[size];
+		for (int i = 0; i < size; i++) {
+			x_prev[i] = 1;
+			x_next[i] = 0;
+		}
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size + 1; j++) {
+				x_next[i] += A[i][j] * x_prev[j];
+			}
+			x_next[i] += B[i];
+		}
+		int counter = 0;
+		while (counter < 1000) { //abs(Norma(x_next) - abs(Norma(x_prev))) >= 0.0001
+			double* tmp_x;
+			tmp_x = new double[size];
+			for (int i = 0; i < size; i++) {
+				tmp_x[i] = x_next[i];
+			}
+
+			for (int i = 0; i < size; i++) {
+				for (int j = 0; j < size + 1; j++) {
+					x_next[i] += A[i][j] * x_prev[j];
+				}
+				x_next[i] += B[i];
+			}
+
+			for (int i = 0; i < size; i++) {
+				x_prev[i] = tmp_x[i];
+			}
+			counter++;
+		}
+		return x_next;
+	}
 };
