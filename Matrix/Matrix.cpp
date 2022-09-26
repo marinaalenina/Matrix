@@ -30,14 +30,14 @@ public:
 			delete[] matrix;
 	}
 
-	int get_matrix_el(int i, int j) {
+	double get_matrix_el(int i, int j) {
 		if (size > 0)
 			return matrix[i][j];
 		else
 			return 0;
 	}
 
-	void set_matrix_el(int i, int j, int value) {
+	void set_matrix_el(int i, int j, double value) {
 		if ((i < 0) || (i >= size))
 			return;
 		if ((j < 0) || (j >= size + 1))
@@ -85,6 +85,7 @@ public:
 			else
 				mat.set_matrix_el(0, i, matrix[0][i] / (-matrix[0][0]));
 		}
+		mat.print();
 		for (int i = 0; i < size - 1; i++) {
 			for (int k = 1; k < size - i; k++) {
 				for (int j = i; j < size + 1; j++) {
@@ -94,6 +95,14 @@ public:
 						matrix[i + k][j] = value;
 				}
 				mat.print();
+			}
+			if (abs(mat.get_matrix_el(i + 1, i + 1)) != 1) {
+				for (int p = i + 1; p < size + 1; p++) {
+					if (matrix[i + 1][0] > 0)
+						mat.set_matrix_el(i + 1, p, matrix[i + 1][p] / matrix[i + 1][i + 1]);
+					else
+						mat.set_matrix_el(i + 1, p, matrix[i + 1][p] / (-matrix[i + 1][i + 1]));
+				}
 			}
 		}
 		double s = 0;
@@ -105,24 +114,16 @@ public:
 		}
 		return ans;
 	}
-
-	double* iter() {
-		double** E;
-		E = new double* [size];
+	// Не доработано!
+	// Метод простых итераций
+	/*double* iter() {
+		double eps = 0.0001;
+		double** E = new double* [size];
 		for (int i = 0; i < size; i++) {
 			E[i] = new double[size + 1];
 		}
-		double** A;
-		A = new double* [size];
-		for (int i = 0; i < size; i++) {
-			A[i] = new double[size];
-		}
 		Matrix mat(size);
-		double* main_koef;
-		main_koef = new double[size];
-		double* B;
-		B = new double[size];
-
+		double* main_koef = new double[size];
 		//Заполнение единичной матрицы
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size + 1; j++) {
@@ -139,18 +140,14 @@ public:
 
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size + 1; j++) {
-				A[i][j] = matrix[i][j] / main_koef[i];
+				mat.set_matrix_el(i, j, matrix[i][j] / main_koef[i]);
 			}
 		}
 
 		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size + 1; j++) {
-				A[i][j] = E[i][j] - A[i][j];
+			for (int j = 0; j < size; j++) {
+				mat.set_matrix_el(i, j, E[i][j] - mat.get_matrix_el(i, j));
 			}
-		}
-
-		for (int i = 0; i < size; i++) {
-			B[i] = matrix[i][size] / main_koef[i];
 		}
 
 		double* x_prev = new double[size];
@@ -161,12 +158,16 @@ public:
 		}
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size + 1; j++) {
-				x_next[i] += A[i][j] * x_prev[j];
+				if (i == j)
+					continue;
+				else
+					x_next[i] += mat.get_matrix_el(i, j) * x_prev[j];
 			}
-			x_next[i] += B[i];
+			x_next[i] += mat.get_matrix_el(i, size + 1);
 		}
-		int counter = 0;
-		while (counter < 1000) { //abs(Norma(x_next) - abs(Norma(x_prev))) >= 0.0001
+		
+		bool flag = true;
+		do {
 			double* tmp_x;
 			tmp_x = new double[size];
 			for (int i = 0; i < size; i++) {
@@ -175,16 +176,24 @@ public:
 
 			for (int i = 0; i < size; i++) {
 				for (int j = 0; j < size + 1; j++) {
-					x_next[i] += A[i][j] * x_prev[j];
+					x_next[i] += mat.get_matrix_el(i, j) * x_prev[j];
 				}
-				x_next[i] += B[i];
+				x_next[i] += mat.get_matrix_el(i, size + 1);
 			}
-
+			for (int i = 0; i < size; i++)
+				cout << x_next[i] << " ";
+			cout << endl;
+			flag = true;
+			for (int i = 0; i < size; i++) {
+				if (abs(x_next[i] - x_prev[i]) >= eps) {
+					flag = false;
+					break;
+				}
+			}
 			for (int i = 0; i < size; i++) {
 				x_prev[i] = tmp_x[i];
 			}
-			counter++;
-		}
+		} while (!flag);
 		return x_next;
-	}
+	}*/
 };

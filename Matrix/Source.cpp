@@ -6,7 +6,11 @@ using namespace std;
 
 
 int main() {
-    int n, a;
+    int n;
+    double a;
+
+    // Ввод с клавиатуры
+ 
     //cout << "Input the number of equations: ";
     //cin >> n;
     //cout << "Input the coefficients for the equation:" << endl;
@@ -24,6 +28,9 @@ int main() {
     //    }
     //    cout << endl;
     //}
+
+    // Чтение данных из файла
+
     ifstream fin;
     fin.open("input.txt");
     fin >> n;
@@ -36,12 +43,12 @@ int main() {
     }
     M.print();
     M.print_equations();
-    double* answer = M.calculate();
-    for (int i = 0; i < n; i++)
-        cout << answer[i] << "\t";
-    cout << endl;
     double* x_next = M.iter();
     for (int i = 0; i < n; i++) {
         cout << "x" << i << " = " << x_next[i] << std::endl;
     }
+    double* answer = M.calculate();
+    for (int i = 0; i < n; i++)
+        cout << answer[i] << "\t";
+    cout << endl;
 }
