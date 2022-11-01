@@ -1,4 +1,6 @@
 #include <iostream>
+#include <math.h>
+#define e 0.005
 
 using namespace std;
 
@@ -114,86 +116,85 @@ public:
 		}
 		return ans;
 	}
-	// Не доработано!
-	// Метод простых итераций
-	/*double* iter() {
-		double eps = 0.0001;
-		double** E = new double* [size];
-		for (int i = 0; i < size; i++) {
-			E[i] = new double[size + 1];
-		}
-		Matrix mat(size);
-		double* main_koef = new double[size];
-		//Заполнение единичной матрицы
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size + 1; j++) {
-				if (i == j)
-					E[i][j] = 1;
-				else
-					E[i][j] = 0;
-			}
-		}
 
-		for (int i = 0; i < size; i++) {
-			main_koef[i] = matrix[i][i];
-		}
-
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size + 1; j++) {
-				mat.set_matrix_el(i, j, matrix[i][j] / main_koef[i]);
-			}
-		}
-
+	//void Preob() {
+	//	double temp = 0;
+	//	Matrix mat(size);
+	//	for (int i = 0; i < size; i++) {
+	//		temp = matrix[i][i] * (-1);
+	//		for (int j = 0; j < size + 1; j++) {
+	//			mat.set_matrix_el(i, j, matrix[i][j] / temp);
+	//			if (i == j)
+	//				mat.set_matrix_el(i, j, 0);
+	//			if(j == size)
+	//				mat.set_matrix_el(i, j, mat.get_matrix_el(i, j) * (-1));
+	//		}
+	//	}
+	//}
+	double Norma(double** matrix) {
+		double sum = 0, max = 0;
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
-				mat.set_matrix_el(i, j, E[i][j] - mat.get_matrix_el(i, j));
+				sum += fabs(matrix[i][j]);
+				if (sum > max)
+					max = sum;
 			}
+			sum = 0;
 		}
+		return max;
+	}
 
-		double* x_prev = new double[size];
-		double* x_next = new double[size];
+	double Pogr(double** matrix) {
+		double eps = 0;
+		double norm = Norma(matrix);
+		eps = ((1 - norm) / norm) * e;
+		return eps;
+	}
+
+	void Itera() {
+		double* x = new double[size];
+		double* x0 = new double[size];
+		double* E = new double[size];
+		double max = 0, per = 0;
+		double temp = 0;
+		Matrix mat(size);
 		for (int i = 0; i < size; i++) {
-			x_prev[i] = 1;
-			x_next[i] = 0;
-		}
-		for (int i = 0; i < size; i++) {
+			temp = matrix[i][i] * (-1);
 			for (int j = 0; j < size + 1; j++) {
+				mat.set_matrix_el(i, j, matrix[i][j] / temp);
 				if (i == j)
-					continue;
-				else
-					x_next[i] += mat.get_matrix_el(i, j) * x_prev[j];
+					mat.set_matrix_el(i, j, 0);
+				if (j == size)
+					mat.set_matrix_el(i, j, mat.get_matrix_el(i, j) * (-1));
 			}
-			x_next[i] += mat.get_matrix_el(i, size + 1);
 		}
-		
-		bool flag = true;
+		per = Pogr(mat.matrix);
+		for (int i = 0; i < size; i++)
+			x0[i] = mat.get_matrix_el(i, size);
+		int counter = 0;
 		do {
-			double* tmp_x;
-			tmp_x = new double[size];
 			for (int i = 0; i < size; i++) {
-				tmp_x[i] = x_next[i];
-			}
-
-			for (int i = 0; i < size; i++) {
-				for (int j = 0; j < size + 1; j++) {
-					x_next[i] += mat.get_matrix_el(i, j) * x_prev[j];
+				x[i] = 0;
+				for (int j = 0; j < size; j++) {
+					x[i] += mat.get_matrix_el(i, j) * x0[j];
 				}
-				x_next[i] += mat.get_matrix_el(i, size + 1);
+				x[i] += mat.get_matrix_el(i, size);
+				E[i] = fabs(x[i] - x0[i]);
 			}
-			for (int i = 0; i < size; i++)
-				cout << x_next[i] << " ";
-			cout << endl;
-			flag = true;
+			max = 0;
 			for (int i = 0; i < size; i++) {
-				if (abs(x_next[i] - x_prev[i]) >= eps) {
-					flag = false;
-					break;
-				}
+				if (max < E[i])
+					max = E[i];
+				x0[i] = x[i];
 			}
-			for (int i = 0; i < size; i++) {
-				x_prev[i] = tmp_x[i];
-			}
-		} while (!flag);
-		return x_next;
-	}*/
+			cout << endl << "max = " << max;
+			counter++;
+		} while (max > per);
+		cout << endl << "Count iter: " << counter << endl;
+		for (int i = 0; i < size; i++)
+			cout << "x" << i + 1 << "=" << x[i] << " " << endl;
+		delete[] x;
+		delete[] x0;
+		delete[] E;
+	}
 };

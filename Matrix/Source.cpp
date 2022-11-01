@@ -43,10 +43,9 @@ int main() {
     }
     M.print();
     M.print_equations();
-    //double* x_next = M.iter();
-    //for (int i = 0; i < n; i++) {
-    //    cout << "x" << i << " = " << x_next[i] << std::endl;
-    //}
+    //M.Preob();
+    M.print();
+    M.Itera();
     double* answer = M.calculate();
     for (int i = 0; i < n; i++)
         cout <<"X" << i + 1 << " = " << answer[i] << "\t";
